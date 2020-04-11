@@ -1,0 +1,23 @@
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+
+# Allow longer scrollback.
+defscrollback 10000
+
+# Visual bells are obnoxious.
+vbell off
+
+# Include the window title in the message used for activity monitoring.
+activity "Activity in window %n (%t)"
+
+# Wait for 35 seconds of silence instead of the default 30.
+silencewait 35
+
+# Set up status bar
+hardstatus on
+hardstatus alwayslastline '%{= G}[ %{G}%H:%S %{g}][%= %{= W}%n*%f %t%= %{= g}][ %{y}Load: %l %{g}][ %{B}%Y-%m-%d %D %{W}%C:%s %A %{g}]'
+
+# Key bindings for easier navigation between regions.
+bind j focus down
+bind k focus up
+bind l focus right
+bind h focus left
