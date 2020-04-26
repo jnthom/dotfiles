@@ -9,8 +9,6 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 
 " Plugins
-Plugin 'Valloric/YouCompleteMe'
-
 Plugin 'scrooloose/nerdtree'
 
 Plugin 'Lokaltog/vim-powerline'
