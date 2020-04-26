@@ -1,22 +1,46 @@
+set -o vi
+
 shopt -s expand_aliases
 shopt -s globstar
-alias ut='date +%s' # Unix time
 
-alias find_images_over_2048=$'identify -format "%f %w x %h\n" *.png | awk \'$2>2048 || $4>2048\''
+# Bash history related stuff
+export HISTSIZE=100000                   # big big history
+export HISTFILESIZE=100000               # big big history
+shopt -s histappend                      # append to history, don't overwrite it
 
-# Usage: run_server server_command port label
-function run_server() {
-  PORT=${2-8000}
-  URL="http://$HOSTNAME:$PORT"
-  export SCREEN_WINDOW_NAME_SUFFIX="$3 $URL"
-  screen_set_window_title
-  trap 'true' SIGINT
-  $1 $PORT
-  export SCREEN_WINDOW_NAME_SUFFIX=""
-}
+export VISUAL=vim
+export EDITOR="$VISUAL"
 
-# Screen-specific functions
+
+# Functions
+
+# Screen-specific
 if [[ "$TERM" = screen* ]]; then
+  # Set the screen window name
+  function screen_set_window_title () {
+    local HPWD="$PWD"
+    local CITCROOT="/google/src/cloud/$USER"
+    local X20ROOT="/google/data/*/users/*/$USER"
+    case $HPWD in
+      ## If I'm in a citc client
+      $CITCROOT/*)
+        local TMPHPWD="${HPWD#$CITCROOT/}"
+        HPWD="citc: ${TMPHPWD%%/*}";;
+
+      ## If I'm in x20
+      $X20ROOT*)
+        HPWD="x20";;
+
+      ## short name option:
+      *) HPWD="bash"
+    esac
+    if [ "$SCREEN_WINDOW_NAME_SUFFIX" ]; then
+      HPWD="$HPWD $SCREEN_WINDOW_NAME_SUFFIX"
+    fi
+    printf '\ek%s\e\\' "$HPWD"
+  }
+  PROMPT_COMMAND="${PROMPT_COMMAND}screen_set_window_title;"
+
   # Credit:
   # https://fortmantechtalk.wordpress.com/2013/07/16/linux-screen-command-auto-renumber-your-screens/
   function renumber_screen_windows() {
@@ -34,10 +58,15 @@ if [[ "$TERM" = screen* ]]; then
     screen -X msgminwait 1
     screen -X msgwait 5
   }
+
+  # Usage: run_server server_command port label
+  function run_server() {
+    PORT=${2-8000}
+    URL="http://$HOSTNAME:$PORT"
+    export SCREEN_WINDOW_NAME_SUFFIX="$3 $URL"
+    screen_set_window_title
+    trap 'true' SIGINT
+    $1 $PORT
+    export SCREEN_WINDOW_NAME_SUFFIX=""
+  }
 fi
-
-
-# Bash history related stuff
-export HISTSIZE=100000                   # big big history
-export HISTFILESIZE=100000               # big big history
-shopt -s histappend                      # append to history, don't overwrite it
